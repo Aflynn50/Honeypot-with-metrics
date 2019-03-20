@@ -19,4 +19,4 @@ class SSHpot():
         factory.publicKeys = {'ssh-rsa': publicKey}
         factory.portal = Portal(None)
 
-        reactor.listenTCP(22, factory)
+        reactor.listenTCP(2222, factory)

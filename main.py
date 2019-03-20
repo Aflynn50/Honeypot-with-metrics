@@ -12,5 +12,6 @@ def simpleObserver(event):
     print(formatEvent(event))
 
 s = SSHpot()
+s.run()
 #f = FTPpot()
 reactor.run()
