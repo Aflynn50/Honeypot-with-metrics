@@ -60,7 +60,7 @@ class Visualiser(threading.Thread):
         self.gdf = gpd.read_file(self.shapefile)[['ISO2', 'geometry']].to_crs('+proj=robin')
 
     def update_data(self):
-        with open(self.logfile) as log:
+        with open(self.logfile, 'r') as log:
             lines = log.readlines()
             for i in range(len(lines)):
                 info = lines[i].split(",")
@@ -69,6 +69,7 @@ class Visualiser(threading.Thread):
                     ccode = str(requests.get(url).json()['country_code'])  # Fetch country code of IPs in file
                     lines[i] += "," + ccode + "\n"
                     self.places.append(ccode)
+        with open(self.logfile,'w') as log:
             log.writelines(lines)
 
     def run(self):
