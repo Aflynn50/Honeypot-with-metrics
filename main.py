@@ -36,7 +36,7 @@ class Pot(threading.Thread):
             insock.close()
             print(data)
             lock.acquire()
-            self.writeLog(address)
+            write_log(address)
             lock.release()
             cv.acquire()
             cv.notify_all()
