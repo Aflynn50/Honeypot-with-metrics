@@ -4,10 +4,8 @@ import socket
 import threading
 import requests
 import matplotlib.pyplot as plt
-# import pandas as pd
-# import pycountry as pyc
 import geopandas as gpd
-# import descartes
+import descartes
 
 
 logfile = 'log.txt'
@@ -101,6 +99,7 @@ class Visualiser(threading.Thread):
             cv.wait()
             cv.release()
 
+
 def stopthread():
     global stop
     input("press any key to stop")
@@ -112,14 +111,19 @@ def stopthread():
         pot.s.close()
 
 
-ports_and_headers = [(2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
-pots = []
+def main():
+    ports_and_headers = [(2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
+    pots = []
 
-for pair in ports_and_headers:
-    pots.append(Pot(pair[0], pair[1]))
-v = Visualiser(logfile)
+    for pair in ports_and_headers:
+        pots.append(Pot(pair[0], pair[1]))
+    v = Visualiser(logfile)
 
-for pot in pots:
-    pot.start()
-v.start()
-threading.Thread(target=stopthread).start()
+    for pot in pots:
+        pot.start()
+    v.start()
+    threading.Thread(target=stopthread).start()
+
+
+if __name__ == '__main__':
+    main()
