@@ -1,24 +1,34 @@
 # https://stackoverflow.com/questions/36758571/python-ssh-servertwisted-conch-get-the-users-commands
-from twisted.python import log
-from twisted.conch.ssh.factory import SSHFactory
-from twisted.conch.ssh.keys import Key
-from twisted.cred.portal import Portal
-from twisted.internet import reactor
-import sys
-class SSHpot():
+import time
+import socket
 
-    def run(self):
-        with open('ssh_key') as privateBlobFile:
-            privateBlob = privateBlobFile.read()
-            privateKey = Key.fromString(data=privateBlob)
 
-        with open('ssh_key.pub') as publicBlobFile:
-            publicBlob = publicBlobFile.read()
-            publicKey = Key.fromString(data=publicBlob)
+def writeLog(client, data=''):
+    separator = '=' * 50
+    fopen = open('./honey.mmh', 'a')
+    fopen.write('Time: %s\nIP: %s\nPort: %d\nData: %s\n%s\n\n' % (time.ctime(), client[0], client[1], data, separator))
+    fopen.close()
 
-        factory = SSHFactory()
-        factory.privateKeys = {'ssh-rsa': privateKey}
-        factory.publicKeys = {'ssh-rsa': publicKey}
-        factory.portal = Portal(None)
-        log.startLogging(sys.stdout)
-        reactor.listenTCP(2222, factory)
+
+def main(host, port, motd):
+    print('Starting honeypot!')
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host, port))
+    s.listen(100)
+    while True:
+        (insock, address) = s.accept()
+        print('Connection from: %s:%d' % (address[0], address[1]))
+        try:
+            insock.send('%s\n' % (motd))
+            data = insock.recv(1024)
+            insock.close()
+            print(data)
+        except socket.error:
+            print(address)
+        else:
+            print(address + "  " + data)
+
+
+main("0.0.0.0", 2222, "hello there")
+
+
