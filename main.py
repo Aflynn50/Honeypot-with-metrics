@@ -53,6 +53,7 @@ class Visualiser(threading.Thread):
         threading.Thread.__init__(self)
         self.places = []
         self.logfile = logf
+        open(logf, 'w').close()
         self.api_key = "7424304154661ba7476d457c0adb3a1a"
         self.ip_getter = "http://api.ipstack.com/{0}?access_key={1}&fields=country_code"
         self.shapefile = "TM_WORLD_BORDERS-0.3.shp"
@@ -68,6 +69,7 @@ class Visualiser(threading.Thread):
                     ccode = str(requests.get(url).json()['country_code'])  # Fetch country code of IPs in file
                     lines[i] += "," + ccode + "\n"
                     self.places.append(ccode)
+            log.writelines(lines)
 
     def run(self):
         while True:
