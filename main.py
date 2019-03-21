@@ -36,7 +36,7 @@ class Pot(threading.Thread):
             insock.close()
             print(data)
             lock.acquire()
-            write_log(address)
+            write_log(str(address[0]))
             lock.release()
             cv.acquire()
             cv.notify_all()
@@ -59,13 +59,13 @@ class Visualiser(threading.Thread):
         self.gdf = gpd.read_file(self.shapefile)[['ISO2', 'geometry']].to_crs('+proj=robin')
 
     def update_data(self):
-        with open(self.logfile, 'rw') as log:
+        with open(self.logfile) as log:
             lines = log.readlines()
             for i in range(len(lines)):
                 info = lines[i].split(",")
                 if len(info) == 1:
                     url = self.ip_getter.format(str(lines[i]), self.api_key)
-                    ccode = requests.get(url).json()['country_code']  # Fetch country code of IPs in file
+                    ccode = str(requests.get(url).json()['country_code'])  # Fetch country code of IPs in file
                     lines[i] += "," + ccode
                     self.places.append(ccode)
 
