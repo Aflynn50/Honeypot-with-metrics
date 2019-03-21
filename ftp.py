@@ -9,4 +9,4 @@ class FTPpot():
         p = Portal(FTPRealm('./'), [])
         f = FTPFactory(p)
         log.startLogging(sys.stdout)
-        reactor.listenTCP(2221, f)
+        reactor.listenTCP(21, f)
