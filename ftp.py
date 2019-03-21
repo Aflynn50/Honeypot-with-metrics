@@ -7,8 +7,6 @@ import sys
 class FTPpot():
     def run(self):
         p = Portal(FTPRealm('./'), [])
-        log.startLogging(sys.stdout)
-
         f = FTPFactory(p)
-
+        log.startLogging(sys.stdout)
         reactor.listenTCP(2221, f)
