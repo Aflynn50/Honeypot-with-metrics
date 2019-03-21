@@ -11,4 +11,4 @@ class FTPpot():
 
         f = FTPFactory(p)
 
-        reactor.listenTCP(21, f)
+        reactor.listenTCP(2221, f)
