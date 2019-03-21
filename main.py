@@ -89,12 +89,12 @@ class Visualiser(threading.Thread):
         while True:
             if stop:
                 plt.savefig("map.png")
-                print("a")
+                print("asad")
                 return
-            print("viz working")
+            #print("viz working")
             self.update_data()
             self.gdf['Count'] = self.gdf['ISO2'].map((lambda x: self.places.count(x)))
-            # print(self.gdf.sample())
+            print(self.places)
             ax = self.gdf.dropna().plot(column='Count', cmap='Reds', figsize=(16, 10), k=9)
             plt.show()
             cv.acquire()
