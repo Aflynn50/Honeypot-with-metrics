@@ -16,20 +16,28 @@ lock = threading.Lock()
 
 cv = threading.Condition()
 
+stop = False
+
 class Pot(threading.Thread):
     def __init__(self, port, header):
         threading.Thread.__init__(self)
         self.port = port
         self.header = header
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.bind(('0.0.0.0', self.port))
+        self.s.listen(100)
+
 
     def run(self):
         print('Starting honeypot!')
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('0.0.0.0', self.port))
-        s.listen(100)
-
         while True:
-            (insock, address) = s.accept()
+            if stop:
+                cv.acquire()
+                cv.notify_all()
+                cv.release()
+                print("a")
+                return
+            (insock, address) = self.s.accept()
             print('Connection from: {}:{} on port {}'.format(address[0], address[1], self.port))
             insock.send(self.header.encode())
             data = insock.recv(1024)
@@ -79,15 +87,29 @@ class Visualiser(threading.Thread):
 
     def run(self):
         while True:
-            cv.acquire()
-            cv.wait()
-            cv.release()
+            if stop:
+                plt.savefig("map.png")
+                print("a")
+                return
             print("viz working")
             self.update_data()
             self.gdf['Count'] = self.gdf['ISO2'].map((lambda x: self.places.count(x)))
             # print(self.gdf.sample())
             ax = self.gdf.dropna().plot(column='Count', cmap='Reds', figsize=(16, 10), k=9)
             plt.show()
+            cv.acquire()
+            cv.wait()
+            cv.release()
+
+def stopthread():
+    global stop
+    input("press any key to stop")
+    print("ok")
+    stop = True
+    for pot in pots:
+        socket.socket(socket.AF_INET,
+                      socket.SOCK_STREAM).connect(('0.0.0.0', pot.port))
+        pot.s.close()
 
 
 ports_and_headers = [(2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
@@ -100,3 +122,4 @@ v = Visualiser(logfile)
 for pot in pots:
     pot.start()
 v.start()
+threading.Thread(target=stopthread).start()
