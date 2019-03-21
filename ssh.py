@@ -29,6 +29,6 @@ def main(host, port, motd):
             print(str(address) + "  " + str(data))
 
 
-main("0.0.0.0", 2222, "hello there")
+main("0.0.0.0", 21, "hello there")
 
 
