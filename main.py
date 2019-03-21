@@ -45,7 +45,7 @@ class Pot(threading.Thread):
 
 def write_log(client, data=''):
     with open(logfile, 'a') as log:
-        log.write(client)
+        log.write(client + "\n")
 
 
 class Visualiser(threading.Thread):
@@ -66,7 +66,7 @@ class Visualiser(threading.Thread):
                 if len(info) == 1:
                     url = self.ip_getter.format(str(lines[i]), self.api_key)
                     ccode = str(requests.get(url).json()['country_code'])  # Fetch country code of IPs in file
-                    lines[i] += "," + ccode
+                    lines[i] += "," + ccode + "\n"
                     self.places.append(ccode)
 
     def run(self):
@@ -74,6 +74,7 @@ class Visualiser(threading.Thread):
             cv.acquire()
             cv.wait()
             cv.release()
+            print("viz working")
             self.update_data()
             self.gdf['Count'] = self.gdf['ISO2'].map((lambda x: self.places.count(x)))
             # print(self.gdf.sample())
