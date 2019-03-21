@@ -15,6 +15,7 @@ def main(host, port, motd):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
     s.listen(100)
+
     while True:
         (insock, address) = s.accept()
         print('Connection from: %s:%d' % (address[0], address[1]))
@@ -29,6 +30,6 @@ def main(host, port, motd):
             print(str(address) + "  " + str(data))
 
 
-main("0.0.0.0", 21, "hello there")
+main("0.0.0.0", 21, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n")
 
 
