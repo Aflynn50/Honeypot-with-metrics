@@ -26,7 +26,7 @@ def main(host, port, motd):
         except socket.error:
             print(address)
         else:
-            print(address + "  " + data)
+            print(str(address) + "  " + str(data))
 
 
 main("0.0.0.0", 2222, "hello there")
