@@ -44,8 +44,13 @@ class Pot(threading.Thread):
 
 
 def write_log(client, data=''):
-    with open(logfile, 'a') as log:
-        log.write(client + "\n")
+    flag = False
+    with open(logfile, 'r') as log:
+        if client in map((lambda x: x.split(',')[0]), log.readlines()):
+            flag = True
+    if flag:
+        with open(logfile, 'a') as log:
+            log.write(client + "\n")
 
 
 class Visualiser(threading.Thread):
