@@ -67,7 +67,7 @@ class Visualiser(threading.Thread):
                 if len(info) == 1:
                     url = self.ip_getter.format(str(lines[i]), self.api_key)
                     ccode = str(requests.get(url).json()['country_code'])  # Fetch country code of IPs in file
-                    lines[i] += "," + ccode + "\n"
+                    lines[i] = lines[i][:-1] + "," + ccode + "\n"
                     self.places.append(ccode)
         with open(self.logfile,'w') as log:
             log.writelines(lines)
