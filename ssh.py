@@ -19,7 +19,7 @@ def main(host, port, motd):
         (insock, address) = s.accept()
         print('Connection from: %s:%d' % (address[0], address[1]))
         try:
-            insock.send('%s\n' % (motd))
+            insock.send(bytes(motd))
             data = insock.recv(1024)
             insock.close()
             print(data)
