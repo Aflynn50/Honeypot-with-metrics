@@ -9,6 +9,7 @@ import descartes
 
 from telnet import telnet
 from vnc import vnc
+from sip import sip
 
 logfile = 'log.txt'
 credfile = 'creds.txt'
