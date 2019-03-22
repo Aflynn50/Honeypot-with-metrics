@@ -85,6 +85,7 @@ class BasicListner(threading.Thread):
             lock.acquire()
             write_ip_log(str(address[0]))
             lock.release()
+            print("Hit on port " + str(self.port))
             cv.acquire()
             cv.notify_all()
             cv.release()
