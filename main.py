@@ -140,6 +140,7 @@ class Visualiser(threading.Thread):
             print(self.places)
             ax = self.gdf.dropna().plot(column='Count', cmap='Reds', figsize=(16, 10), k=9)
             plt.show()
+            plt.savefig("info/map.png")
             cv.acquire()
             cv.wait()
             cv.release()
@@ -152,13 +153,17 @@ def httpServer():
 
 def stopthread():
     global stop
-    input("press enter to stop")
-    print("stopping")
+    input("press enter to stop\n")
+    print("stopping\n")
     stop = True
     for pot in pots:
         socket.socket(socket.AF_INET,
                       socket.SOCK_STREAM).connect(('0.0.0.0', pot.port))
         pot.s.close()
+    for listener in listeners:
+        socket.socket(socket.AF_INET,
+                      socket.SOCK_STREAM).connect(('0.0.0.0', listener.port))
+        listener.s.close()
 
 
 def main():
@@ -173,7 +178,7 @@ def main():
 
     v.start()
     threading.Thread(target=stopthread).start()
-    threading.Thread(target=httpServer()).start()
+    threading.Thread(target=httpServer).start()
 
     for p in range(1, 400):
         listeners.append(BasicListner(p))
