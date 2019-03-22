@@ -177,12 +177,13 @@ def main():
         pot.start()
 
     v.start()
-    threading.Thread(target=stopthread).start()
     threading.Thread(target=httpServer).start()
 
     for p in range(1, 400):
         listeners.append(BasicListner(p))
         listeners[-1].start()
+
+    threading.Thread(target=stopthread).start()
 
     input("press enter to stop")
 
