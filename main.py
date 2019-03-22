@@ -7,20 +7,21 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 import descartes
 
+from telnet import telnet
 
 logfile = 'log.txt'
-
+credfile = 'creds.txt'
 lock = threading.Lock()
-
 cv = threading.Condition()
-
 stop = False
+pots = []
+
 
 class Pot(threading.Thread):
-    def __init__(self, port, header):
+    def __init__(self, port, protocol_func):
         threading.Thread.__init__(self)
         self.port = port
-        self.header = header
+        self.proto = protocol_func
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.bind(('0.0.0.0', self.port))
         self.s.listen(100)
@@ -37,26 +38,31 @@ class Pot(threading.Thread):
                 return
             (insock, address) = self.s.accept()
             print('Connection from: {}:{} on port {}'.format(address[0], address[1], self.port))
-            insock.send(self.header.encode())
-            data = insock.recv(1024)
+
+            u, p = self.proto(insock, address)
             insock.close()
-            print(data)
             lock.acquire()
-            write_log(str(address[0]))
+            write_ip_log(str(address[0]))
+            write_cred_log(str(u), str(p))
             lock.release()
             cv.acquire()
             cv.notify_all()
             cv.release()
 
 
-def write_log(client, data=''):
+def write_ip_log(address):
     infile = False
     with open(logfile, 'r') as log:
-        if client in map((lambda x: x.split(',')[0]), log.readlines()):
+        if address in map((lambda x: x.split(',')[0]), log.readlines()):
             infile = True
     if not infile:
         with open(logfile, 'a') as log:
-            log.write(client + "\n")
+            log.write(address + "\n")
+
+
+def write_cred_log(user, password):
+    with open(credfile, 'a') as cred:
+        cred.write(user + ',' + password + "\n")
 
 
 class Visualiser(threading.Thread):
@@ -89,7 +95,6 @@ class Visualiser(threading.Thread):
                 plt.savefig("map.png")
                 print("asad")
                 return
-            #print("viz working")
             self.update_data()
             self.gdf['Count'] = self.gdf['ISO2'].map((lambda x: self.places.count(x)))
             print(self.places)
@@ -112,8 +117,7 @@ def stopthread():
 
 
 def main():
-    ports_and_headers = [(2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
-    pots = []
+    ports_and_headers = [(23, telnet)]  # (2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
 
     for pair in ports_and_headers:
         pots.append(Pot(pair[0], pair[1]))
