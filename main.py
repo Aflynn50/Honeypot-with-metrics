@@ -19,31 +19,32 @@ pots = []
 
 
 class Pot(threading.Thread):
-    def __init__(self, port, protocol_func):
+    def __init__(self, port, protocol_func, hascred):
         threading.Thread.__init__(self)
+        self.hascred = hascred
         self.port = port
         self.proto = protocol_func
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.bind(('0.0.0.0', self.port))
         self.s.listen(100)
 
-
     def run(self):
-        print('Starting honeypot!')
+        print('Starting ' + self.proto.__name__ + ' honeypot!')
         while True:
             (insock, address) = self.s.accept()
             if stop:
                 cv.acquire()
                 cv.notify_all()
                 cv.release()
-                print("a")
+                print("Shutdown "+ self.proto.__name__+' honeypot')
                 return
-            print('Connection from: {}:{} on port {}'.format(address[0], address[1], self.port))
+            print('Connection from: {}:{} on port {}, the '.format(address[0], address[1], self.port) + self.proto.__name__+' honeypot')
             u, p = self.proto(insock, address)
             insock.close()
             lock.acquire()
             write_ip_log(str(address[0]))
-            write_cred_log(str(u), str(p))
+            if self.hascred:
+                write_cred_log(str(u), str(p))
             lock.release()
             cv.acquire()
             cv.notify_all()
@@ -93,7 +94,7 @@ class Visualiser(threading.Thread):
         while True:
             if stop:
                 plt.savefig("map.png")
-                print("asad")
+                print("Visualiser shut down")
                 return
             self.update_data()
             self.gdf['Count'] = self.gdf['ISO2'].map((lambda x: self.places.count(x)))
@@ -117,7 +118,7 @@ def stopthread():
 
 
 def main():
-    ports_and_headers = [(23, telnet), (5900, vnc)]  # (2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
+    ports_and_headers = [(23, telnet, True), (5900, vnc, True), (5060, sip, False)]  # (2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
 
     for pair in ports_and_headers:
         pots.append(Pot(pair[0], pair[1]))

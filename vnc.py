@@ -1,5 +1,6 @@
 import binascii
 
+# not working for some reason (not sure why)
 
 def vnc(insock, address):
     insock.send(binascii.unhexlify("524642203030332e3030380a"))
@@ -7,7 +8,7 @@ def vnc(insock, address):
     insock.send(binascii.unhexlify('0102'))
     data = insock.recv(1024)
     print(data)
-    insock.send(binascii.unhexlify('0000000000000000'))
+    insock.send(binascii.unhexlify('00000000'))
     data = insock.recv(1024)
     print(data)
     insock.send(binascii.unhexlify('043a02ff2018000100ff00ff00ff1008000000000000000d4745525449452d445747445747'))
