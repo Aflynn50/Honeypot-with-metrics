@@ -9,7 +9,7 @@ import descartes
 
 from telnet import telnet
 from vnc import vnc
-from sip import sip
+from sippy import sippy
 from ftp import ftp
 
 logfile = 'log.txt'
