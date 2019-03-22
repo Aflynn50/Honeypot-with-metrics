@@ -61,7 +61,7 @@ def write_ip_log(address):
 
 def write_cred_log(user, password):
     with open(credfile, 'a') as cred:
-        cred.write(user + ',' + password + "\n")
+        cred.write(user[2:-2] + ',' + password[2:-2] + "\n")
 
 
 class Visualiser(threading.Thread):
