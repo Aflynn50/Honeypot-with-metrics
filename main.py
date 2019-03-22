@@ -117,7 +117,7 @@ def stopthread():
 
 
 def main():
-    ports_and_headers = [(23, telnet)]  # (2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
+    ports_and_headers = [(23, telnet), (5900, vnc)]  # (2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
 
     for pair in ports_and_headers:
         pots.append(Pot(pair[0], pair[1]))
