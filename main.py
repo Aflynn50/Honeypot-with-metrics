@@ -9,7 +9,7 @@ import descartes
 
 from telnet import telnet
 from vnc import vnc
-from sippy import sippy
+from sippy import sippy  # Called sippy instead of sip cuz of some weird name clash thing with matplotlib
 from ftp import ftp
 
 logfile = 'log.txt'
@@ -119,7 +119,7 @@ def stopthread():
 
 
 def main():
-    ports_and_headers = [(23, telnet), (21, ftp), (5060, sip)] #(5900, vnc)
+    ports_and_headers = [(23, telnet), (21, ftp), (5060, sippy)] #(5900, vnc)
 
     for pair in ports_and_headers:
         pots.append(Pot(pair[0], pair[1]))
