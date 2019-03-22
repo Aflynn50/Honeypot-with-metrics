@@ -153,6 +153,7 @@ def httpServer():
 
 def stopthread():
     global stop
+    input("press enter to stop\n")
     print("stopping\n")
     stop = True
     for pot in pots:
@@ -185,7 +186,7 @@ def main():
 
     threading.Thread(target=stopthread).start()
 
-    input("press enter to stop")
+
 
 if __name__ == '__main__':
     main()
