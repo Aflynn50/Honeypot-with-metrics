@@ -15,7 +15,7 @@ from telnet import telnet
 from vnc import vnc
 from ftp import ftp
 
-logfile = 'log.txt'
+logfile = 'info/log.txt'
 credfile = 'info/creds.txt'
 lock = threading.Lock()
 cv = threading.Condition()
