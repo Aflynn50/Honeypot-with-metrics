@@ -7,17 +7,21 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 import descartes
 
+import http.server
+import socketserver
+
+
 from telnet import telnet
 from vnc import vnc
-from sippy import sippy  # Called sippy instead of sip cuz of some weird name clash thing with matplotlib
 from ftp import ftp
 
 logfile = 'log.txt'
-credfile = 'creds.txt'
+credfile = 'info/creds.txt'
 lock = threading.Lock()
 cv = threading.Condition()
 stop = False
 pots = []
+listeners = []
 
 
 class Pot(threading.Thread):
@@ -46,6 +50,38 @@ class Pot(threading.Thread):
             write_ip_log(str(address[0]))
             if u:
                 write_cred_log(str(u), str(p))
+            lock.release()
+            cv.acquire()
+            cv.notify_all()
+            cv.release()
+
+
+class BasicListner(threading.Thread):
+    def __init__(self, port_num):
+        self.working = True
+        self.port = port_num
+        try:
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.s.bind(('0.0.0.0', port_num))
+            self.s.listen(1)
+        except Exception:
+            self.working = False
+
+    def run(self):
+        if not self.working:
+            return
+        while True:
+            (insock, address) = self.s.accept()
+            if stop:
+                cv.acquire()
+                cv.notify_all()
+                cv.release()
+                print("Shutdown listener on port " + self.port)
+                return
+            insock.close()
+            lock.acquire()
+            write_ip_log(str(address[0]))
             lock.release()
             cv.acquire()
             cv.notify_all()
@@ -94,7 +130,7 @@ class Visualiser(threading.Thread):
     def run(self):
         while True:
             if stop:
-                plt.savefig("map.png")
+                plt.savefig("info/map.png")
                 print("Visualiser shut down")
                 return
             self.update_data()
@@ -106,10 +142,15 @@ class Visualiser(threading.Thread):
             cv.wait()
             cv.release()
 
+def httpServer():
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", 80), handler) as httpd:
+        print("serving at port", 80)
+        httpd.serve_forever()
 
 def stopthread():
     global stop
-    input("press any key to stop")
+    input("press enter to stop")
     print("stopping")
     stop = True
     for pot in pots:
@@ -119,16 +160,24 @@ def stopthread():
 
 
 def main():
-    ports_and_headers = [(23, telnet), (21, ftp), (5060, sippy)] #(5900, vnc)
+    ports_and_headers = [(23, telnet), (21, ftp)] #(5900, vnc)
 
     for pair in ports_and_headers:
         pots.append(Pot(pair[0], pair[1]))
     v = Visualiser(logfile)
 
+    for p in range(1,65535):
+        listeners.append(BasicListner(p))
+        listeners[:-1].start()
+
     for pot in pots:
         pot.start()
+
+
+
     v.start()
     threading.Thread(target=stopthread).start()
+    threading.Thread(target=httpServer())
 
 
 if __name__ == '__main__':
