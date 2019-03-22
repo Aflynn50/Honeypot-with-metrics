@@ -17,6 +17,7 @@ from ftp import ftp
 
 logfile = 'info/log.txt'
 credfile = 'info/creds.txt'
+open(credfile, 'w').close()
 lock = threading.Lock()
 cv = threading.Condition()
 stop = False
