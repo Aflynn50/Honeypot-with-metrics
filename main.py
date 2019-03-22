@@ -168,7 +168,7 @@ def main():
         pots.append(Pot(pair[0], pair[1]))
     v = Visualiser(logfile)
 
-    for p in range(1, 1000):
+    for p in range(1, 400):
         listeners.append(BasicListner(p))
         listeners[-1].start()
 
