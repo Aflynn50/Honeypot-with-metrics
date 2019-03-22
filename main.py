@@ -30,14 +30,13 @@ class Pot(threading.Thread):
     def run(self):
         print('Starting honeypot!')
         while True:
+            (insock, address) = self.s.accept()
             if stop:
                 cv.acquire()
                 cv.notify_all()
                 cv.release()
                 print("a")
                 return
-
-            (insock, address) = self.s.accept()
             print('Connection from: {}:{} on port {}'.format(address[0], address[1], self.port))
             u, p = self.proto(insock, address)
             insock.close()
