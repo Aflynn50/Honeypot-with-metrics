@@ -10,6 +10,7 @@ import descartes
 from telnet import telnet
 from vnc import vnc
 from sip import sip
+from ftp import ftp
 
 logfile = 'log.txt'
 credfile = 'creds.txt'
@@ -20,9 +21,8 @@ pots = []
 
 
 class Pot(threading.Thread):
-    def __init__(self, port, protocol_func, hascred):
+    def __init__(self, port, protocol_func):
         threading.Thread.__init__(self)
-        self.hascred = hascred
         self.port = port
         self.proto = protocol_func
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,14 +37,14 @@ class Pot(threading.Thread):
                 cv.acquire()
                 cv.notify_all()
                 cv.release()
-                print("Shutdown "+ self.proto.__name__+' honeypot')
+                print("Shutdown " + self.proto.__name__+' honeypot')
                 return
             print('Connection from: {}:{} on port {}, the '.format(address[0], address[1], self.port) + self.proto.__name__+' honeypot')
             u, p = self.proto(insock, address)
             insock.close()
             lock.acquire()
             write_ip_log(str(address[0]))
-            if self.hascred:
+            if u:
                 write_cred_log(str(u), str(p))
             lock.release()
             cv.acquire()
@@ -110,7 +110,7 @@ class Visualiser(threading.Thread):
 def stopthread():
     global stop
     input("press any key to stop")
-    print("ok")
+    print("stopping")
     stop = True
     for pot in pots:
         socket.socket(socket.AF_INET,
@@ -119,7 +119,7 @@ def stopthread():
 
 
 def main():
-    ports_and_headers = [(23, telnet, True), (5900, vnc, True), (5060, sip, False)]  # (2222, "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3\r\n"), (2221, "")]
+    ports_and_headers = [(23, telnet), (21, ftp), (5060, sip)] #(5900, vnc)
 
     for pair in ports_and_headers:
         pots.append(Pot(pair[0], pair[1]))

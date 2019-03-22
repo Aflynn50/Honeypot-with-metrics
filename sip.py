@@ -1,2 +1,2 @@
 def sip(insock, address):
-    pass
+    return "", ""

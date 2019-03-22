@@ -1,6 +1,7 @@
 import binascii
 
 # not working for some reason (not sure why)
+# copied protocol from here https://github.com/magisterquis/vnclowpot
 
 def vnc(insock, address):
     insock.send(binascii.unhexlify("524642203030332e3030380a"))
