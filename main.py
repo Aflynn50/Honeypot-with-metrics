@@ -153,7 +153,6 @@ def httpServer():
 
 def stopthread():
     global stop
-    input("press enter to stop\n")
     print("stopping\n")
     stop = True
     for pot in pots:
@@ -161,9 +160,10 @@ def stopthread():
                       socket.SOCK_STREAM).connect(('0.0.0.0', pot.port))
         pot.s.close()
     for listener in listeners:
-        socket.socket(socket.AF_INET,
-                      socket.SOCK_STREAM).connect(('0.0.0.0', listener.port))
-        listener.s.close()
+        if listener.working:
+            socket.socket(socket.AF_INET,
+                          socket.SOCK_STREAM).connect(('0.0.0.0', listener.port))
+            listener.s.close()
 
 
 def main():
@@ -184,6 +184,7 @@ def main():
         listeners.append(BasicListner(p))
         listeners[-1].start()
 
+    input("press enter to stop\n")
 
 if __name__ == '__main__':
     main()
