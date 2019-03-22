@@ -58,6 +58,7 @@ class Pot(threading.Thread):
 
 class BasicListner(threading.Thread):
     def __init__(self, port_num):
+        threading.Thread.__init__(self)
         self.working = True
         self.port = port_num
         try:
@@ -71,6 +72,7 @@ class BasicListner(threading.Thread):
     def run(self):
         if not self.working:
             return
+        print("Starting listner on port" + self.port)
         while True:
             (insock, address) = self.s.accept()
             if stop:
@@ -168,7 +170,7 @@ def main():
 
     for p in range(1,65535):
         listeners.append(BasicListner(p))
-        listeners[:-1].start()
+        listeners[-1].start()
 
     for pot in pots:
         pot.start()
