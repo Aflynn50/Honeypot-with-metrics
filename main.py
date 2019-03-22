@@ -184,7 +184,7 @@ def main():
         listeners.append(BasicListner(p))
         listeners[-1].start()
 
-    input("press enter to stop\n")
+    input("press enter to stop")
 
 if __name__ == '__main__':
     main()
