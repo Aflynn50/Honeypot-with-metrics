@@ -72,14 +72,14 @@ class BasicListner(threading.Thread):
     def run(self):
         if not self.working:
             return
-        print("Starting listner on port" + self.port)
+        print("Starting listner on port" + str(self.port))
         while True:
             (insock, address) = self.s.accept()
             if stop:
                 cv.acquire()
                 cv.notify_all()
                 cv.release()
-                print("Shutdown listener on port " + self.port)
+                print("Shutdown listener on port " + str(self.port))
                 return
             insock.close()
             lock.acquire()
@@ -168,7 +168,7 @@ def main():
         pots.append(Pot(pair[0], pair[1]))
     v = Visualiser(logfile)
 
-    for p in range(1,65535):
+    for p in range(1, 1000):
         listeners.append(BasicListner(p))
         listeners[-1].start()
 
