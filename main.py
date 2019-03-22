@@ -8,6 +8,7 @@ import geopandas as gpd
 import descartes
 
 from telnet import telnet
+from vnc import vnc
 
 logfile = 'log.txt'
 credfile = 'creds.txt'
@@ -61,7 +62,7 @@ def write_ip_log(address):
 
 def write_cred_log(user, password):
     with open(credfile, 'a') as cred:
-        cred.write(user[2:-2] + ',' + password[2:-2] + "\n")
+        cred.write(user + ',' + password + "\n")
 
 
 class Visualiser(threading.Thread):
